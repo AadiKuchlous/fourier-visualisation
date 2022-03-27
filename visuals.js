@@ -71,7 +71,7 @@ $(document).ready(function() {
 
 function startDraw() {
   stopDraw();
-  draw_wave_interval = setInterval(draw, 1000 / 60);
+  draw_wave_interval = setInterval(draw, 1000 / 30);
 }
 
 function stopDraw() {
@@ -98,6 +98,15 @@ function updateWaves(preset) {
       let n = ((2 * i) - 1);
       let weight = 4/(pi * n);
       waves.push(new Wave(n, weight, 1));
+    }
+  }
+
+  if (preset == 'tri') {
+    for (i=1; i<35; i++) {
+      let n = ((2 * i) - 1);
+      let weight = (4 * (1 - (-1)**n))/((pi * n)**2);
+      waves.push(new Wave(n, weight, 1));
+      console.log(n, weight);
     }
   }
  
@@ -165,7 +174,7 @@ function draw() {
 
   for (i=0; i<wave_points.length; i++) {
     let y_coor = wave_points.getItem(i);
-    let x_coor = (width/3) + (i*2);
+    let x_coor = (width/3) + (i*2.5);
 //    let x_coor = (width/3) + (rad/2) + (i*2);
 
     canvas.drawLine({
