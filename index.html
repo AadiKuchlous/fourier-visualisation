@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/21.0.1/min/jcanvas.min.js" integrity="sha512-pu2L+33GBCuTrTU3mNJphG2Hm2JKlLA01280LIiz29D40f/UFOU5dEVxVuW46p+HZeZhXvQsUxtVFxPabX9S9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="visuals.js"></script>
+  </head>
+
+  <body>
+    <div id="container" style="height:200px; display: flex; align-items:center; justify-content:center;">
+
+      <button onclick="startDraw()">Start</button>
+      <button onclick="stopDraw()">Stop</button>
+
+    </div>
+
+    <div id="container" style="height:400px; display: flex; align-items:center; justify-content:center;">
+
+      <canvas id="visuals" <!--style="width:60%"-->></canvas>
+
+    </div>
+
+    <div id="container" style="height:200px; display: flex; align-items:center; justify-content:center;">
+
+      <button onclick="updateWaves('sin')">Sine Wave</button>
+      <button onclick="updateWaves('st')">Sawtooth Wave</button>
+      <button onclick="updateWaves('sq')">Square Wave</button>
+
+    </div>
+  </body>
+</html>
