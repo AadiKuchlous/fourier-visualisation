@@ -63,6 +63,10 @@ class Queue {
       this.end_pointer += this.items.length;
     }
   }
+
+  clearQueue() {
+    this.items = new Array(this.max_length);
+  }
 }
 
 
@@ -93,9 +97,9 @@ $(document).ready(function() {
   width = canvas.width;
   height = canvas.height;
 
-  updateWaves('sin');
-
   wave_points = new Queue(Math.floor(width/3));
+
+  presetWaves('sin');
 
 //  startDraw();
 
@@ -110,18 +114,19 @@ function stopDraw() {
   clearInterval(draw_wave_interval);
 }
 
-function updateWaves(preset) {
+function presetWaves(preset) {
   waves = [];
+  wave_points.clearQueue();
   startDraw();
 
   if (preset == 'sin') {
-    waves.push(new Wave(1, 1, 1));
+    waves.push(new Wave(1, 1, 0));
   }
 
   if (preset == 'st') {
     for (i=1; i<6; i++) {
       let weight = (-2/(pi*i)) * ((-1)**i);
-      waves.push(new Wave(i, weight, 1));
+      waves.push(new Wave(i, weight, 0));
     }
   }
 
@@ -129,18 +134,20 @@ function updateWaves(preset) {
     for (i=1; i<6; i++) {
       let n = ((2 * i) - 1);
       let weight = 4/(pi * n);
-      waves.push(new Wave(n, weight, 1));
+      waves.push(new Wave(n, weight, 0));
     }
   }
 
   if (preset == 'tri') {
-    for (i=1; i<35; i++) {
+    for (i=1; i<6; i++) {
       let n = ((2 * i) - 1);
       let weight = (4 * (1 - (-1)**n))/((pi * n)**2);
-      waves.push(new Wave(n, weight, 1));
+      waves.push(new Wave(n, weight, pi/2));
       console.log(n, weight);
     }
   }
+
+  updateUI();
  
 }
 
@@ -165,7 +172,7 @@ function draw() {
       start:0,end:360
     })
 
-    let angle = (time * 2 * pi * wave.freq) % (2*pi);
+    let angle = (time * 2 * pi * wave.freq) % (2*pi) + wave.phase;
 
     curx = prevx + (Math.cos(angle) * wave.weight * height/10);
     cury = prevy + (Math.sin(angle) * wave.weight * height/10);
@@ -243,4 +250,9 @@ function draw() {
   }
 
 //  window.requestAnimationFrame(draw);
+}
+
+
+function updateUI() {
+  console.log(waves[0]);
 }
