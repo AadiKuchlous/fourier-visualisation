@@ -7,25 +7,20 @@
   </head>
 
   <body>
-    <div id="controls-container" style="height:200px; display: flex; align-items:center; justify-content:center;">
-
+    <div id="controls-container" style="height:50px; display: flex; align-items:center; justify-content:center;">
       <button onclick="startDraw()">Start</button>
       <button onclick="stopDraw()">Stop</button>
-
     </div>
 
-    <div id="container" style="height:400px; display: flex; align-items:center; justify-content:center;">
+    <div id="container" style="height:400px; display: flex; align-items:center; justify-content:center; z-index:-1">
 
-      <canvas id="visuals" <!--style="width:60%"-->></canvas>
+      <canvas id="visuals" style="z-index: -1;"></canvas>
 
     </div>
-
-    <div id="presets-container" style="height:200px; display: flex; align-items:center; justify-content:center;">
-
+<div id="presets-container" style="height:200px; display: flex; align-items:center; justify-content:center;">
       <button onclick="updateWaves('sin')">Sine Wave</button>
       <button onclick="updateWaves('st')">Sawtooth Wave</button>
       <button onclick="updateWaves('sq')">Square Wave</button>
-
-    </div>
+</div>
   </body>
 </html>

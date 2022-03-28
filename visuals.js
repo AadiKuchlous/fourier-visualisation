@@ -3,33 +3,57 @@ const pi = Math.PI;
 var width = 300, height = 150;
 var start_time = 0;
 
-
 class Queue {
-  constructor() {
-    this.items = [];
-    this.max_length = 100;
+  constructor(size) {
+    this.items = new Array(size);
+    this.max_length = size;
     this.length = 0;
+    this.front_pointer = 0;
+    this.end_pointer = 0;
   }
 
   enqueue(element) {
-    this.items.unshift(element);
-    this.length += 1;
+    if (this.isFull()) {
+      return "Overflow";
+    }
+    else {
+      this.front_pointer -= 1;
+      this.normalizePointers();
+      this.items[this.front_pointer] = element;
+      this.length += 1;
+    }
   }
 
   dequeue() {
     if(this.isEmpty()) {
       return "Underflow";
     }
+
+    this.end_pointer -= 1;
+    this.normalizePointers();
+    this.items[this.end_pointer] = null;
     this.length -= 1;
-    return this.items.pop();
   }
 
   isEmpty() {
-    return this.items.length == 0;
+    return this.length == 0;
+  }
+
+  isFull() {
+    return this.length == this.items.length;
   }
 
   getItem(i) {
     return this.items[i];
+  }
+
+  normalizePointers() {
+    if (this.front_pointer < 0) {
+      this.front_pointer += this.items.length;
+    }
+    if (this.end_pointer < 0) {
+      this.end_pointer += this.items.length;
+    }
   }
 }
 
@@ -42,13 +66,13 @@ class Wave {
   }
 }
 
-var wave_points = new Queue();
+var wave_points;
 var waves = [];
 var draw_wave_interval;
 
 $(document).ready(function() {
   console.log( "ready!" );
-  start_time = new Date();
+  start_time = performance.now();
 
   let canvas = $('#visuals')[0];
 
@@ -63,9 +87,9 @@ $(document).ready(function() {
 
   updateWaves('sin');
 
-  wave_points.max_length = width//3;
+  wave_points = new Queue(Math.floor(width/3));
 
-  startDraw();
+//  startDraw();
 
 });
 
@@ -116,7 +140,9 @@ function draw() {
   let canvas = $('#visuals');
   canvas.clearCanvas();
 
-  let time = new Date() - start_time;
+  let time = performance.now() - start_time;
+
+  // Draw the Circles and radii
 
   let prevx = width/6, prevy = height/2, curx = 0, cury = 0;
 
@@ -155,6 +181,8 @@ function draw() {
     })
   }
 
+  // Draw horizontal line connecting end of cicles and wavefront
+
   canvas.drawLine({
     strokeStyle: "black",
     strokeWidth: 1,
@@ -163,18 +191,25 @@ function draw() {
     x2: width/3, y2: prevy
   })
 
-  if (wave_points.length >= wave_points.max_length) {
+  // Update the wave_points array
+
+  if (wave_points.isFull()) {
     wave_points.dequeue();
   }
   wave_points.enqueue(prevy);
 
+  // Draw wave
+
 //  let rad = (canvas[0].width * 2)/(3 * wave_points.max_length);
-  let start_y_coor = wave_points.getItem(0);
-  let start_x_coor = width/3;
+  let start = wave_points.front_pointer;
+
+  let start_y_coor = wave_points.getItem(start);
+  let start_x_coor = Math.floor(width/3);
 
   for (i=0; i<wave_points.length; i++) {
-    let y_coor = wave_points.getItem(i);
-    let x_coor = (width/3) + (i*2.5);
+    n = (start + i) % wave_points.items.length;
+    let y_coor = wave_points.getItem(n);
+    let x_coor = start_x_coor + ((width*2/3)/wave_points.max_length);
 //    let x_coor = (width/3) + (rad/2) + (i*2);
 
     canvas.drawLine({
@@ -188,6 +223,7 @@ function draw() {
 
     start_y_coor = y_coor;
     start_x_coor = x_coor;
+
 /*
     canvas.drawArc({
       strokeStyle: "black",
@@ -197,7 +233,6 @@ function draw() {
     })
 */
   }
-
 
 //  window.requestAnimationFrame(draw);
 }
