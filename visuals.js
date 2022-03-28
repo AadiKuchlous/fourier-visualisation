@@ -3,6 +3,14 @@ const pi = Math.PI;
 var width = 300, height = 150;
 var start_time = 0;
 
+var colors = [
+ "#213d05",
+ "#35c7e2",
+ "#5704e7",
+ "#8cccc9",
+ "#e3d1b0"
+];
+
 class Queue {
   constructor(size) {
     this.items = new Array(size);
@@ -60,7 +68,7 @@ class Queue {
 
 class Wave {
   constructor(freq, weight, phase) {
-    this.freq = freq / 3000;
+    this.freq = freq / 5000;
     this.weight = weight;
     this.phase = phase;
   }
@@ -150,7 +158,7 @@ function draw() {
     let wave = waves[i];
 
     canvas.drawArc({
-      strokeStyle: 'blue',
+      strokeStyle: colors[i%colors.length],
       strokeWidth: 2,
       x: prevx, y: prevy,
       radius: Math.abs(wave.weight * height/10),
@@ -173,13 +181,13 @@ function draw() {
     prevx = curx;
     prevy = cury;
 
-    canvas.drawArc({
-      strokeStyle: "black",
-      fillStyle: "black",
-      x: prevx, y: prevy,
-      radius: 2
-    })
   }
+  canvas.drawArc({
+    strokeStyle: "black",
+    fillStyle: "black",
+    x: prevx, y: prevy,
+    radius: 2
+  })
 
   // Draw horizontal line connecting end of cicles and wavefront
 
