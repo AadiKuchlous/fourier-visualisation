@@ -1,7 +1,9 @@
 const pi = Math.PI;
+const framerate = 30;
 
 var width = 300, height = 150;
 var start_time = 0;
+var drawing = true;
 
 var colors = [
  "#213d05",
@@ -72,9 +74,14 @@ class Queue {
 
 class Wave {
   constructor(freq, weight, phase) {
-    this.freq = freq / 5000;
+    this.freq = freq;
     this.weight = weight;
     this.phase = phase;
+    this.angle = phase;
+  }
+
+  resetAngle() {
+    this.angle = this.phase;
   }
 }
 
@@ -107,11 +114,15 @@ $(document).ready(function() {
 
 function startDraw() {
   stopDraw();
-  draw_wave_interval = setInterval(draw, 1000 / 30);
+  drawing = true;
+  draw();
+//  draw_wave_interval = setInterval(draw, 1000 / 30);
 }
 
 function stopDraw() {
-  clearInterval(draw_wave_interval);
+  drawing = false;
+  clearTimeouts();
+//  clearInterval(draw_wave_interval);
 }
 
 function presetWaves(preset) {
@@ -120,18 +131,18 @@ function presetWaves(preset) {
   startDraw();
 
   if (preset == 'sin') {
-    waves.push(new Wave(1, 1, 0));
+    waves.push(new Wave(1, 1, pi/2));
   }
 
   if (preset == 'st') {
-    for (i=1; i<6; i++) {
+    for (i=1; i<7; i++) {
       let weight = (-2/(pi*i)) * ((-1)**i);
       waves.push(new Wave(i, weight, 0));
     }
   }
 
   if (preset == 'sq') {
-    for (i=1; i<6; i++) {
+    for (i=1; i<7; i++) {
       let n = ((2 * i) - 1);
       let weight = 4/(pi * n);
       waves.push(new Wave(n, weight, 0));
@@ -139,11 +150,11 @@ function presetWaves(preset) {
   }
 
   if (preset == 'tri') {
-    for (i=1; i<6; i++) {
+    for (i=1; i<7; i++) {
       let n = ((2 * i) - 1);
       let weight = (4 * (1 - (-1)**n))/((pi * n)**2);
       waves.push(new Wave(n, weight, pi/2));
-      console.log(n, weight);
+      // console.log(n, weight);
     }
   }
 
@@ -152,10 +163,14 @@ function presetWaves(preset) {
 }
 
 function draw() {
+  if (drawing) {
+    setTimeout(draw, 1000 / framerate)
+  }
+
   let canvas = $('#visuals');
   canvas.clearCanvas();
 
-  let time = performance.now() - start_time;
+//  let time = performance.now() - start_time;
 
   // Draw the Circles and radii
 
@@ -172,7 +187,11 @@ function draw() {
       start:0,end:360
     })
 
-    let angle = (time * 2 * pi * wave.freq) % (2*pi) + wave.phase;
+    let angle = (wave.angle - (2 * pi * (wave.freq / 5) / framerate)) % (2*pi);
+
+    // console.log(angle)
+
+    wave.angle = angle;
 
     curx = prevx + (Math.cos(angle) * wave.weight * height/10);
     cury = prevy + (Math.sin(angle) * wave.weight * height/10);
@@ -215,7 +234,6 @@ function draw() {
 
   // Draw wave
 
-//  let rad = (canvas[0].width * 2)/(3 * wave_points.max_length);
   let start = wave_points.front_pointer;
 
   let start_y_coor = wave_points.getItem(start);
@@ -225,7 +243,6 @@ function draw() {
     n = (start + i) % wave_points.items.length;
     let y_coor = wave_points.getItem(n);
     let x_coor = start_x_coor + ((width*2/3)/wave_points.max_length);
-//    let x_coor = (width/3) + (rad/2) + (i*2);
 
     canvas.drawLine({
       strokeStyle: "black",
@@ -239,14 +256,6 @@ function draw() {
     start_y_coor = y_coor;
     start_x_coor = x_coor;
 
-/*
-    canvas.drawArc({
-      strokeStyle: "black",
-      fillStyle: "black",
-      x: x_coor, y: y_coor,
-      radius: rad
-    })
-*/
   }
 
 //  window.requestAnimationFrame(draw);
@@ -254,5 +263,63 @@ function draw() {
 
 
 function updateUI() {
-  console.log(waves[0]);
+  // console.log(waves[0]);
+  let UIcontainer = $("#ui-container");
+  UIcontainer.html('')
+
+  for (i=0; i<waves.length; i++) {
+    let wave = waves[i];
+    let waveUI = $('<div/>').addClass("wave-UI-box");
+
+    let weightSlider = $('<input/>').attr('type', 'range')
+			.attr('id', `weight-slider-${i}`)
+			.attr('min', '0')
+			.attr('max', '1')
+			.attr('step', 'any')
+			.attr('value', wave.weight.toString())
+			.addClass('weight-slider')
+			.attr('onchange', 'updateWaves()');
+
+    let phaseSlider = $('<input/>').attr('type', 'range')
+			.attr('id', `phase-slider-${i}`)
+			.attr('min', '0')
+			.attr('max', pi.toString())
+			.attr('step', 'any')
+			.attr('value', wave.phase.toString())
+			.addClass('phase-slider')
+			.attr('onchange', 'updateWaves()');
+
+
+    waveUI.append(weightSlider);
+    waveUI.append(phaseSlider);
+
+    UIcontainer.append(waveUI);
+  }
+}
+
+
+function updateWaves() {
+  console.log('updating')
+  for (i=0; i<waves.length; i++) {
+    let weightSlider = $(`#weight-slider-${i}`);
+    let phaseSlider = $(`#phase-slider-${i}`);
+    waves[i].weight = parseFloat(weightSlider.val());
+    waves[i].phase = parseFloat(phaseSlider.val());
+    waves[i].resetAngle();
+
+    console.log(parseFloat(weightSlider.val()));
+  }
+
+  clearTimeouts();
+  wave_points.clearQueue();
+  startDraw();
+}
+
+
+function clearTimeouts() {
+  const highestId = window.setTimeout(() => {
+    for (let i = highestId; i >= 0; i--) {
+      window.clearTimeout(i);
+    }
+  }, 0);
 }
