@@ -1,0 +1,19 @@
+#ui-container {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.wave-UI-box {
+  background-color: antiquewhite;
+  width: 50%;
+  height: 50px;
+  display:flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.weight-slider, .phase-slider {
+  width: 40%;
+}
