@@ -1,16 +1,46 @@
+#full-table {
+  background-color: antiquewhite;
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+}
+
+#freq-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+}
+
+.freq-label {
+  background-color: antiquewhite;
+  height: 50px;
+  display:flex;
+  justify-content: space-around;
+  width: 100%;
+  align-items: center;
+}
+
+.header {
+  font-weight: bold;
+}
+
 #ui-container {
+  grid-column: 2 / span 1;
   display:flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
 
+#controls-area {
+  display: contents;
+}
+
 .wave-UI-box {
-  background-color: antiquewhite;
-  width: 50%;
   height: 50px;
   display:flex;
   justify-content: space-around;
+  width: 100%;
   align-items: center;
 }
 

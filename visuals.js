@@ -13,6 +13,19 @@ var colors = [
  "#e3d1b0"
 ];
 
+const labels = [
+  'First',
+  'Second',
+  'Third',
+  'Fourth',
+  'Fifth',
+  'Sixth',
+  'Seventh',
+  'Eighth',
+  'Ninth',
+  'Tenth'
+]
+
 class Queue {
   constructor(size) {
     this.items = new Array(size);
@@ -68,6 +81,9 @@ class Queue {
 
   clearQueue() {
     this.items = new Array(this.max_length);
+    this.length = 0;
+    this.front_pointer = 0;
+    this.end_pointer = 0;
   }
 }
 
@@ -77,11 +93,18 @@ class Wave {
     this.freq = freq;
     this.weight = weight;
     this.phase = phase;
-    this.angle = phase;
+    if (this.weight < 0) {
+        this.phase += pi;
+    }
+    this.updateValues();
   }
 
-  resetAngle() {
+  updateValues() {
     this.angle = this.phase;
+    if (this.weight < 0) {
+      this.angle += pi;
+      this.weight = Math.abs(this.weight);
+    }
   }
 }
 
@@ -124,7 +147,7 @@ function stopDraw() {
   clearTimeouts();
 //  clearInterval(draw_wave_interval);
 }
-
+ 
 function presetWaves(preset) {
   waves = [];
   wave_points.clearQueue();
@@ -183,7 +206,7 @@ function draw() {
       strokeStyle: colors[i%colors.length],
       strokeWidth: 2,
       x: prevx, y: prevy,
-      radius: Math.abs(wave.weight * height/10),
+      radius: wave.weight * height/10,
       start:0,end:360
     })
 
@@ -264,8 +287,11 @@ function draw() {
 
 function updateUI() {
   // console.log(waves[0]);
-  let UIcontainer = $("#ui-container");
+  let UIcontainer = $("#controls-area");
   UIcontainer.html('')
+
+  let Freqcontainer = $("#freq-label-area");
+  Freqcontainer.html('')
 
   for (i=0; i<waves.length; i++) {
     let wave = waves[i];
@@ -294,6 +320,11 @@ function updateUI() {
     waveUI.append(phaseSlider);
 
     UIcontainer.append(waveUI);
+
+    let label = $('<div/>').addClass('freq-label');
+    label.text(`${labels[i]} Harmonic`);
+
+    Freqcontainer.append(label);
   }
 }
 
@@ -305,7 +336,7 @@ function updateWaves() {
     let phaseSlider = $(`#phase-slider-${i}`);
     waves[i].weight = parseFloat(weightSlider.val());
     waves[i].phase = parseFloat(phaseSlider.val());
-    waves[i].resetAngle();
+    waves[i].updateValues();
 
     console.log(parseFloat(weightSlider.val()));
   }
